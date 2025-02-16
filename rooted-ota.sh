@@ -331,9 +331,16 @@ function patchOTAs() {
 
       ../.tmp/afsr pack -o raw.img
       touch avb.toml
-      ../.tmp/avbroot avb pack -o system.img --recompute-size -f
+      ../.tmp/avbroot avb pack -o system.img -k $KEY_AVB --recompute-size -f
       cd ..
-      .tmp/avbroot ota patch -i ".tmp/$OTA_TARGET.zip" -o ".tmp/$OTA_TARGET.zip.patched" --replace system extracted/system.img
+      .tmp/avbroot ota patch \ 
+        -i ".tmp/$OTA_TARGET.zip" \
+        -o ".tmp/$OTA_TARGET.zip.patched" \
+        --replace system extracted/system.img \
+        --key-avb "$KEY_AVB" \
+        --key-ota "$KEY_OTA" \
+        --cert-ota "$CERT_OTA" \
+        --rootless
 
       if [[ "$flavor" == 'magisk' ]]; then
         args+=("--patch-arg=--magisk" "--patch-arg" ".tmp/magisk-$MAGISK_VERSION.apk")
