@@ -312,6 +312,7 @@ function patchOTAs() {
 
       .tmp/avbroot ota extract -i ".tmp/$OTA_TARGET.zip" -d extracted && cd extracted
       .tmp/avbroot avb unpack -i system.img
+      ls
       afsr unpack -i raw.img
 
       for font in fs_tree/system/fonts/*.ttf; do
