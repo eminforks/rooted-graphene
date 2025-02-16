@@ -333,7 +333,7 @@ function patchOTAs() {
       touch avb.toml
       ../.tmp/avbroot avb pack -o system.img -k "../$KEY_AVB" --recompute-size -f
       cd ..
-      .tmp/avbroot ota patch \ 
+      .tmp/avbroot ota patch \
         -i ".tmp/$OTA_TARGET.zip" \
         -o ".tmp/$OTA_TARGET.zip.patched" \
         --replace system extracted/system.img \
