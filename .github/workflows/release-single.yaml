@@ -2,9 +2,9 @@ name: Release single device
 
 on:
   # Note that push/PR will not release, only build to see if there are obvious failures
-  push:
-    branches:
-      - '*'
+#  push:
+#    branches:
+#      - '*'
   pull_request:
     types: [synchronize, opened, reopened]
 
