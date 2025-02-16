@@ -309,6 +309,8 @@ function patchOTAs() {
     if ls "$targetFile" >/dev/null 2>&1; then
       printGreen "File $targetFile already exists locally, not patching."
     else
+      patchSystem
+
       local args=()
 
       args+=("--output" "$targetFile")
@@ -317,33 +319,6 @@ function patchOTAs() {
       args+=("--sign-key-ota" "$KEY_OTA")
       args+=("--sign-cert-ota" "$CERT_OTA")
 
-      .tmp/avbroot ota extract -i ".tmp/$OTA_TARGET.zip" -d extracted
-      cd extracted
-      ../.tmp/avbroot avb unpack -i system.img
-      ../.tmp/afsr unpack -i raw.img
-
-      for font in fs_tree/system/fonts/*.ttf; do
-          if [[ "${font,,}" != *"emoji"* ]]; then
-              cp ../font/text.ttf "$font"
-          fi
-      done
-      cp "../font/emoji.ttf" "fs_tree/system/fonts/NotoColorEmoji.ttf"
-
-      ../.tmp/afsr pack -o raw.img                                                                                                                    
-      touch avb.toml
-      AVB_KEY_PASS="$PASSPHRASE_AVB"
-      ../.tmp/avbroot avb pack -o system.img -k "../$KEY_AVB" --recompute-size --pass-env-var AVB_KEY_PASS
-      cd ..
-      .tmp/avbroot ota patch \
-        -i ".tmp/$OTA_TARGET.zip" \
-        -o ".tmp/$OTA_TARGET.zip.patched" \
-        --replace system extracted/system.img \
-        --key-avb "$KEY_AVB" \
-        --key-ota "$KEY_OTA" \
-        --cert-ota "$CERT_OTA" \
-        --pass-avb-env-var AVB_KEY_PASS \
-        --pass-ota-env-var OTA_KEY_PASS \
-        --rootless
       if [[ "$flavor" == 'magisk' ]]; then
         args+=("--patch-arg=--magisk" "--patch-arg" ".tmp/magisk-$MAGISK_VERSION.apk")
         args+=("--patch-arg=--magisk-preinit-device" "--patch-arg" "$MAGISK_PREINIT_DEVICE")
@@ -359,7 +334,9 @@ function patchOTAs() {
       fi
 
       args+=("--module-custota" ".tmp/custota.zip")
-      args+=("--module-oemunlockonboot" ".tmp/oemunlockonboot.zip")
+      if [[ "$flavor" == 'magisk' ]]; then
+        args+=("--module-oemunlockonboot" ".tmp/oemunlockonboot.zip")
+      fi
       # We patch it later if necessary
       args+=("--skip-custota-tool")
 
@@ -379,6 +356,46 @@ function patchOTAs() {
     fi
     
   done
+}
+
+function patchSystem() {
+  .tmp/avbroot ota extract -i ".tmp/$OTA_TARGET.zip" -d extracted
+  cd extracted
+
+  ../.tmp/avbroot avb unpack -i system.img
+  ../.tmp/afsr unpack -i raw.img
+
+  for font in fs_tree/system/fonts/*.ttf; do
+      if [[ "${font,,}" != *"emoji"* ]]; then
+          cp ../font/text.ttf "$font"
+      fi
+  done
+  cp "../font/emoji.ttf" "fs_tree/system/fonts/NotoColorEmoji.ttf"
+
+  AVB_KEY_PASS="$PASSPHRASE_AVB"
+  OTA_KEY_PASS="$PASSPHRASE_OTA"
+
+  touch avb.toml
+
+  ../.tmp/afsr pack -o raw.img
+  ../.tmp/avbroot avb pack \
+    -o system.img \
+    -k "../$KEY_AVB" \
+    --pass-env-var "$AVB_KEY_PASS" \
+    --recompute-size
+
+  cd ..
+  
+  .tmp/avbroot ota patch \
+    -i ".tmp/$OTA_TARGET.zip" \
+    -o ".tmp/$OTA_TARGET.zip.patched" \
+    --replace system extracted/system.img \
+    --key-avb "$KEY_AVB" \
+    --key-ota "$KEY_OTA" \
+    --cert-ota "$CERT_OTA" \
+    --pass-avb-env-var "$AVB_KEY_PASS" \
+    --pass-ota-env-var "$OTA_KEY_PASS" \
+    --rootless
 }
 
 function base642key() {
