@@ -318,8 +318,8 @@ function patchOTAs() {
       args+=("--sign-cert-ota" "$CERT_OTA")
 
       .tmp/avbroot ota extract -i ".tmp/$OTA_TARGET.zip" -d extracted && cd extracted
-      .tmp/avbroot avb unpack -i system.img
       ls
+      .tmp/avbroot avb unpack -i system.img
       .tmp/afsr unpack -i raw.img
 
       for font in fs_tree/system/fonts/*.ttf; do
