@@ -332,7 +332,7 @@ function patchOTAs() {
       ../.tmp/afsr pack -o raw.img                                                                                                                    
       touch avb.toml
       AVB_KEY_PASS="$PASSPHRASE_AVB"
-      ../.tmp/avbroot avb pack -o system.img -k "../$KEY_AVB" --recompute-size -f --pass-env-var AVB_KEY_PASS
+      ../.tmp/avbroot avb pack -o system.img -k "../$KEY_AVB" --recompute-size --pass-env-var AVB_KEY_PASS
       cd ..
       .tmp/avbroot ota patch \
         -i ".tmp/$OTA_TARGET.zip" \
