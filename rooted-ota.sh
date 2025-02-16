@@ -42,7 +42,7 @@ MAGISK_VERSION=${MAGISK_VERSION:-${DEFAULT_MAGISK_VERSION}}
 SKIP_CLEANUP=${SKIP_CLEANUP:-''}
 
 # Set asset released by this script to latest version, even when OTA_VERSION already exists for this device
-FORCE_OTA_SERVER_UPLOAD=${FORCE_OTA_SERVER_UPLOAD:-'true'}
+FORCE_OTA_SERVER_UPLOAD=${FORCE_OTA_SERVER_UPLOAD:-'false'}
 # Forces the artifacts to be built (and uploaded to a release)
 # even it a release already contains the combination of device and flavor.
 # This will lead to multiple artifacts with different commits on the release (that are not linked in the OTA server and thus are likely never used).
@@ -50,7 +50,7 @@ FORCE_OTA_SERVER_UPLOAD=${FORCE_OTA_SERVER_UPLOAD:-'true'}
 # So these artifacts are just a waste of storage resources. Example
 # shiba-2025020500-3e0add9-rootless.zip
 # shiba-2025020500-6718632-rootless.zip
-FORCE_BUILD=${FORCE_BUILD:-'true'}
+FORCE_BUILD=${FORCE_BUILD:-'false'}
 # Skip setting asset released by this script to latest version, even when OTA_VERSION is latest for this device
 # Takes precedence over FORCE_OTA_SERVER_UPLOAD
 SKIP_OTA_SERVER_UPLOAD=${SKIP_OTA_SERVER_UPLOAD:-'false'}
