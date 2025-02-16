@@ -329,19 +329,21 @@ function patchOTAs() {
       done
       cp "../font/emoji.ttf" "fs_tree/system/fonts/NotoColorEmoji.ttf"
 
-      ../.tmp/afsr pack -o raw.img
+      ../.tmp/afsr pack -o raw.img                                                                                                                    
       touch avb.toml
-      ../.tmp/avbroot avb pack -o system.img -k "../$KEY_AVB" --recompute-size -f
+      AVB_KEY_PASS="$PASSPHRASE_AVB"
+      ../.tmp/avbroot avb pack -o system.img -k "../$KEY_AVB" --recompute-size -f --pass-env-var AVB_KEY_PASS
       cd ..
-      .tmp/avbroot ota patch \
+      avbroot ota patch \
         -i ".tmp/$OTA_TARGET.zip" \
         -o ".tmp/$OTA_TARGET.zip.patched" \
         --replace system extracted/system.img \
         --key-avb "$KEY_AVB" \
         --key-ota "$KEY_OTA" \
         --cert-ota "$CERT_OTA" \
+        --pass-avb-env-var AVB_KEY_PASS \
+        --pass-ota-env-var OTA_KEY_PASS \
         --rootless
-
       if [[ "$flavor" == 'magisk' ]]; then
         args+=("--patch-arg=--magisk" "--patch-arg" ".tmp/magisk-$MAGISK_VERSION.apk")
         args+=("--patch-arg=--magisk-preinit-device" "--patch-arg" "$MAGISK_PREINIT_DEVICE")
