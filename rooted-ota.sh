@@ -331,7 +331,7 @@ function patchOTAs() {
 
       ../.tmp/afsr pack -o raw.img
       touch avb.toml
-      ../.tmp/avbroot avb pack -o system.img -k $KEY_AVB --recompute-size -f
+      ../.tmp/avbroot avb pack -o system.img -k "../$KEY_AVB" --recompute-size -f
       cd ..
       .tmp/avbroot ota patch \ 
         -i ".tmp/$OTA_TARGET.zip" \
