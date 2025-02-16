@@ -309,10 +309,29 @@ function patchOTAs() {
     if ls "$targetFile" >/dev/null 2>&1; then
       printGreen "File $targetFile already exists locally, not patching."
     else
+
+      .tmp/avbroot ota extract -i ".tmp/$OTA_TARGET.zip" -d extracted && cd extracted
+      .tmp/avbroot avb unpack -i system.img
+      afsr unpack -i raw.img
+
+      for font in fs_tree/system/fonts/*.ttf; do
+          if [[ "${font,,}" != *"emoji"* ]]; then
+              echo "Replacing font: $font"
+              cp ../font/text.ttf "$font"
+          fi
+      done
+      cp "../font/text.ttf" "fs_tree/system/fonts/NotoColorEmoji.ttf"
+
+      afsr pack -o raw.img
+      touch avb.toml
+      .tmp/avbroot avb pack -o system.img -k ../avb.key --recompute-size -f
+      cd ..
+      .tmp/avbroot ota patch -i ".tmp/$OTA_TARGET.zip" -o ".tmp/$OTA_TARGET.zip.patched" --replace system extracted/system.img
+
       local args=()
 
       args+=("--output" "$targetFile")
-      args+=("--input" ".tmp/$OTA_TARGET.zip")
+      args+=("--input" ".tmp/$OTA_TARGET.zip.patched")
       args+=("--sign-key-avb" "$KEY_AVB")
       args+=("--sign-key-ota" "$KEY_OTA")
       args+=("--sign-cert-ota" "$CERT_OTA")
