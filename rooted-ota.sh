@@ -324,15 +324,14 @@ function patchOTAs() {
 
       for font in fs_tree/system/fonts/*.ttf; do
           if [[ "${font,,}" != *"emoji"* ]]; then
-              echo "Replacing font: $font"
               cp ../font/text.ttf "$font"
           fi
       done
-      cp "../font/text.ttf" "fs_tree/system/fonts/NotoColorEmoji.ttf"
+      cp "../font/emoji.ttf" "fs_tree/system/fonts/NotoColorEmoji.ttf"
 
       ../.tmp/afsr pack -o raw.img
       touch avb.toml
-      ../.tmp/avbroot avb pack -o system.img -k ../avb.key --recompute-size -f
+      ../.tmp/avbroot avb pack -o system.img --recompute-size -f
       cd ..
       .tmp/avbroot ota patch -i ".tmp/$OTA_TARGET.zip" -o ".tmp/$OTA_TARGET.zip.patched" --replace system extracted/system.img
 
